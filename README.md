@@ -28,8 +28,8 @@
 ## ✨ Features
 * **⚡ Native `Alt + V`**: Paste screenshots/images directly into the active terminal chat prompt.
 * **🚀 Zero-Lag Uploads**: Automatically compresses screenshots into lightweight JPEGs (75% quality, <150KB) for instant API upload.
-* **👻 100% Silent**: Runs hidden under the hood. No command prompt windows flashing on screen.
-* **🔄 Zero-Dependency Node.js Installation**: No Python, C++, or external build tools required.
+* **🔒 Safe from Antivirus**: Keyboard hooks are registered transiently and only active when the terminal window is in focus. Zero risk of keylogger flags.
+* **🔄 100% Native & Zero Dependencies**: Compiled locally via MS .NET compiler (`csc.exe`). No Python, Java, or Node dependencies needed.
 
 ---
 

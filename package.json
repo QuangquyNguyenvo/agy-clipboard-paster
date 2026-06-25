@@ -2,7 +2,7 @@
   "name": "agy-clipboard-paster",
   "version": "1.0.0",
   "description": "Native Alt+V clipboard image paster for Google Antigravity CLI",
-  "main": "bin/index.js",
+  "main": "bin/installer.js",
   "bin": {
     "agy-clipboard-paster": "bin/installer.js"
   },
@@ -10,9 +10,7 @@
     "postinstall": "node bin/installer.js install",
     "preuninstall": "node bin/installer.js uninstall"
   },
-  "dependencies": {
-    "node-global-key-listener": "^0.1.1"
-  },
-  "author": "Admin",
+  "dependencies": {},
+  "author": "QuangquyNguyenvo",
   "license": "MIT"
 }

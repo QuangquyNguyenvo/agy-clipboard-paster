@@ -3,7 +3,7 @@ const path = require('path');
 const { execSync } = require('child_process');
 
 function install() {
-    console.log('Installing agy-clipboard-paster wrapper...');
+    console.log('Installing agy-clipboard-paster native C# wrapper...');
     try {
         let agyDir = '';
         try {
@@ -41,31 +41,20 @@ function install() {
             }
         }
 
-        // 2. Prepare C# wrapper source code with absolute index.js path
-        const wrapperTemplatePath = path.join(__dirname, '..', 'src', 'agy_wrapper.cs');
-        let wrapperCode = fs.readFileSync(wrapperTemplatePath, 'utf8');
-        
-        const indexJsPath = path.join(__dirname, 'index.js').replace(/\\/g, '\\\\');
-        wrapperCode = wrapperCode.replace('{{INDEX_JS_PATH}}', indexJsPath);
+        // 2. Locate C# wrapper source code
+        const wrapperSourcePath = path.join(__dirname, '..', 'src', 'agy_wrapper.cs');
 
-        const tempCsPath = path.join(__dirname, 'agy_wrapper_temp.cs');
-        fs.writeFileSync(tempCsPath, wrapperCode, 'utf8');
-
-        // 3. Compile wrapper to agy.exe using csc.exe
+        // 3. Compile wrapper to agy.exe using csc.exe referencing Windows Forms & Drawing
         const cscCompiler = 'C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\csc.exe';
         if (!fs.existsSync(cscCompiler)) {
             console.error('ERROR: C# compiler csc.exe not found at default location.');
             process.exit(1);
         }
 
-        const compileCmd = `"${cscCompiler}" /out:"${agyPath}" "${tempCsPath}"`;
+        const compileCmd = `"${cscCompiler}" /r:System.Windows.Forms.dll /r:System.Drawing.dll /out:"${agyPath}" "${wrapperSourcePath}"`;
         execSync(compileCmd);
-        console.log(`Successfully compiled and installed wrapper at ${agyPath}`);
+        console.log(`Successfully compiled and installed native wrapper at ${agyPath}`);
 
-        // Cleanup temp file
-        if (fs.existsSync(tempCsPath)) {
-            fs.unlinkSync(tempCsPath);
-        }
     } catch (err) {
         console.error('Installation failed:', err.message);
         process.exit(1);
