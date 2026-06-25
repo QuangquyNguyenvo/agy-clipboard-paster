@@ -24,11 +24,17 @@ if (-not (Test-Path $realAgyPath)) {
     Write-Host "Backed up original agy.exe to agy_real.exe" -ForegroundColor Green
 }
 
-# 3. Download agy_wrapper.cs source from GitHub
-$url = "https://raw.githubusercontent.com/QuangquyNguyenvo/agy-clipboard-paster/main/src/agy_wrapper.cs"
+# 3. Use local C# source if available, otherwise download from GitHub
+$localCs = Join-Path $PSScriptRoot "src\agy_wrapper.cs"
 $tempCs = Join-Path $env:TEMP "agy_wrapper_temp.cs"
-Write-Host "Downloading C# wrapper source code..." -ForegroundColor Cyan
-Invoke-WebRequest -Uri $url -OutFile $tempCs -UseBasicParsing
+if (Test-Path $localCs) {
+    Copy-Item -Path $localCs -Destination $tempCs -Force
+    Write-Host "Using local C# wrapper source code..." -ForegroundColor Cyan
+} else {
+    $url = "https://raw.githubusercontent.com/QuangquyNguyenvo/agy-clipboard-paster/main/src/agy_wrapper.cs"
+    Write-Host "Downloading C# wrapper source code..." -ForegroundColor Cyan
+    Invoke-WebRequest -Uri $url -OutFile $tempCs -UseBasicParsing
+}
 
 # 4. Compile C# wrapper
 $cscCompiler = "C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe"

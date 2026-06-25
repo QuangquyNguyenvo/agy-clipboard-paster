@@ -15,6 +15,7 @@ class Program
 
     private static LowLevelKeyboardProc _proc = HookCallback;
     private static IntPtr _hookID = IntPtr.Zero;
+    private static readonly string _tempFolder = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
 
     [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
     private static extern IntPtr SetWindowsHookEx(int idHook, LowLevelKeyboardProc lpfn, IntPtr hMod, uint dwThreadId);
@@ -35,14 +36,95 @@ class Program
     [DllImport("user32.dll")]
     private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
 
+    [DllImport("kernel32.dll")]
+    private static extern IntPtr GetConsoleWindow();
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool CloseHandle(IntPtr hObject);
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    private static extern IntPtr CreateToolhelp32Snapshot(uint dwFlags, uint th32ProcessID);
+
+    [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
+    private static extern bool Process32First(IntPtr hSnapshot, ref PROCESSENTRY32 lppe);
+
+    [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
+    private static extern bool Process32Next(IntPtr hSnapshot, ref PROCESSENTRY32 lppe);
+
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
+    private struct PROCESSENTRY32
+    {
+        public uint dwSize;
+        public uint cntUsage;
+        public uint th32ProcessID;
+        public IntPtr th32DefaultHeapID;
+        public uint th32ModuleID;
+        public uint cntThreads;
+        public uint th32ParentProcessID;
+        public int pcPriClassBase;
+        public uint dwFlags;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)]
+        public string szExeFile;
+    }
+
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern uint SendInput(uint nInputs, INPUT[] pInputs, int cbSize);
+
+    [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
+    private static extern short GetKeyState(int virtualKeyCode);
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct INPUT
+    {
+        public uint type;
+        public INPUT_UNION union;
+    }
+
+    [StructLayout(LayoutKind.Explicit)]
+    private struct INPUT_UNION
+    {
+        [FieldOffset(0)]
+        public MOUSEINPUT mi;
+        [FieldOffset(0)]
+        public KEYBDINPUT ki;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct MOUSEINPUT
+    {
+        public int dx;
+        public int dy;
+        public uint mouseData;
+        public uint dwFlags;
+        public uint time;
+        public IntPtr dwExtraInfo;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct KEYBDINPUT
+    {
+        public ushort wVk;
+        public ushort wScan;
+        public uint dwFlags;
+        public uint time;
+        public IntPtr dwExtraInfo;
+    }
+
+    private const int INPUT_KEYBOARD = 1;
+    private const uint KEYEVENTF_UNICODE = 0x0004;
+    private const uint KEYEVENTF_KEYUP = 0x0002;
+
     private delegate IntPtr LowLevelKeyboardProc(int nCode, IntPtr wParam, IntPtr lParam);
 
     static void Main(string[] args)
     {
+        Log("agy_wrapper started. Args: " + string.Join(" ", args));
         // 1. Start the keyboard hook loop in a background STA thread
         System.Threading.Thread hookThread = new System.Threading.Thread(() =>
         {
             _hookID = SetHook(_proc);
+            Log("SetHook completed. Hook ID: " + _hookID + ", LastError: " + Marshal.GetLastWin32Error());
             Application.Run();
         });
         hookThread.SetApartmentState(System.Threading.ApartmentState.STA);
@@ -87,7 +169,7 @@ class Program
             // Cleanup any temporary JPEG files
             try
             {
-                string[] files = Directory.GetFiles("C:\\Users\\Admin", "clipboard_temp_*.jpg");
+                string[] files = Directory.GetFiles(_tempFolder, "clipboard_temp_*.jpg");
                 foreach (string file in files)
                 {
                     File.Delete(file);
@@ -115,18 +197,15 @@ class Program
             int vkCode = Marshal.ReadInt32(lParam);
             Keys key = (Keys)vkCode;
 
-            // Detect Alt+V
-            bool altPressed = (Control.ModifierKeys & Keys.Alt) != 0 || 
-                              (wParam == (IntPtr)WM_SYSKEYDOWN && key == Keys.V);
+            // Read flags from lParam to check for Alt down (offset 8 bytes)
+            int flags = Marshal.ReadInt32(lParam, 8);
+            bool altPressed = (flags & 0x20) != 0 || wParam == (IntPtr)WM_SYSKEYDOWN;
 
             if (key == Keys.V && altPressed)
             {
-                // Check if our console window is currently active/foreground
-                IntPtr activeWindow = GetForegroundWindow();
-                uint activeProcessId;
-                GetWindowThreadProcessId(activeWindow, out activeProcessId);
-
-                if (activeProcessId == Process.GetCurrentProcess().Id)
+                bool isConsoleActive = IsConsoleActive();
+                Log("Alt+V detected. IsConsoleActive=" + isConsoleActive);
+                if (isConsoleActive)
                 {
                     // Run clipboard capture in STA thread
                     System.Threading.Thread pasteThread = new System.Threading.Thread(HandleClipboardPaste);
@@ -141,15 +220,100 @@ class Program
         return CallNextHookEx(_hookID, nCode, wParam, lParam);
     }
 
+    private static bool IsConsoleActive()
+    {
+        IntPtr activeWindow = GetForegroundWindow();
+        if (activeWindow == IntPtr.Zero)
+        {
+            Log("IsConsoleActive: activeWindow is Zero");
+            return false;
+        }
+
+        uint activeProcessId;
+        GetWindowThreadProcessId(activeWindow, out activeProcessId);
+
+        uint currentProcessId = (uint)Process.GetCurrentProcess().Id;
+        Log("IsConsoleActive check: activeWindow=" + activeWindow + ", activeProcessId=" + activeProcessId + ", currentProcessId=" + currentProcessId);
+
+        if (activeProcessId == currentProcessId)
+        {
+            Log("IsConsoleActive: Match activeProcessId == currentProcessId");
+            return true;
+        }
+
+        // Check if the active process is our child (e.g., agy_real.exe)
+        uint activeParentPid = GetParentProcessId(activeProcessId);
+        Log("IsConsoleActive check: activeParentPid=" + activeParentPid);
+        if (activeParentPid == currentProcessId)
+        {
+            Log("IsConsoleActive: Match activeParentPid == currentProcessId");
+            return true;
+        }
+
+        // Trace ancestors
+        uint checkPid = currentProcessId;
+        int depth = 0;
+        while (checkPid != 0 && depth < 10)
+        {
+            uint parentPid = GetParentProcessId(checkPid);
+            Log("IsConsoleActive check: checkPid=" + checkPid + " parentPid=" + parentPid);
+            if (parentPid == 0) break;
+            if (parentPid == activeProcessId)
+            {
+                Log("IsConsoleActive: Match parentPid == activeProcessId (" + parentPid + ")");
+                return true;
+            }
+            checkPid = parentPid;
+            depth++;
+        }
+
+        // Fallback: Check if the foreground window is our console window handle
+        IntPtr consoleWindow = GetConsoleWindow();
+        Log("IsConsoleActive check: consoleWindow=" + consoleWindow);
+        if (consoleWindow != IntPtr.Zero && consoleWindow == activeWindow)
+        {
+            Log("IsConsoleActive: Match consoleWindow == activeWindow");
+            return true;
+        }
+
+        Log("IsConsoleActive: No match found, returning false");
+        return false;
+    }
+
+    private static uint GetParentProcessId(uint processId)
+    {
+        uint parentPid = 0;
+        IntPtr handle = CreateToolhelp32Snapshot(2, 0); // TH32CS_SNAPPROCESS = 2
+        if (handle != IntPtr.Zero)
+        {
+            PROCESSENTRY32 pe = new PROCESSENTRY32();
+            pe.dwSize = (uint)Marshal.SizeOf(typeof(PROCESSENTRY32));
+            if (Process32First(handle, ref pe))
+            {
+                do
+                {
+                    if (pe.th32ProcessID == processId)
+                    {
+                        parentPid = pe.th32ParentProcessID;
+                        break;
+                    }
+                } while (Process32Next(handle, ref pe));
+            }
+            CloseHandle(handle);
+        }
+        return parentPid;
+    }
+
     private static void HandleClipboardPaste()
     {
+        Log("HandleClipboardPaste: Called");
         try
         {
             int slot = 1;
             string filepath = "";
             while (slot <= 5)
             {
-                filepath = $"C:\\Users\\Admin\\clipboard_temp_{slot}.jpg";
+                filepath = Path.Combine(_tempFolder, "clipboard_temp_" + slot + ".jpg");
                 if (!File.Exists(filepath))
                 {
                     break;
@@ -159,13 +323,53 @@ class Program
             if (slot > 5)
             {
                 slot = 1;
-                filepath = "C:\\Users\\Admin\\clipboard_temp_1.jpg";
+                filepath = Path.Combine(_tempFolder, "clipboard_temp_1.jpg");
             }
+            Log("HandleClipboardPaste: Slot=" + slot + ", Path=" + filepath);
 
-            IDataObject clipboardData = Clipboard.GetDataObject();
-            if (clipboardData != null && clipboardData.GetDataPresent(DataFormats.Bitmap))
+            IDataObject clipboardData = null;
+            for (int i = 0; i < 5; i++)
             {
-                using (Image img = (Image)clipboardData.GetData(DataFormats.Bitmap))
+                try
+                {
+                    clipboardData = Clipboard.GetDataObject();
+                    break;
+                }
+                catch (System.Runtime.InteropServices.ExternalException ex)
+                {
+                    Log("HandleClipboardPaste: Clipboard retry " + i + " failed: " + ex.Message);
+                    System.Threading.Thread.Sleep(50);
+                }
+            }
+            if (clipboardData != null)
+            {
+                Image imgToSave = null;
+                bool shouldDisposeImage = false;
+
+                if (clipboardData.GetDataPresent(DataFormats.Bitmap))
+                {
+                    imgToSave = (Image)clipboardData.GetData(DataFormats.Bitmap);
+                }
+                else if (clipboardData.GetDataPresent(DataFormats.FileDrop))
+                {
+                    string[] filepaths = (string[])clipboardData.GetData(DataFormats.FileDrop);
+                    if (filepaths != null && filepaths.Length > 0)
+                    {
+                        string firstFile = filepaths[0];
+                        string ext = Path.GetExtension(firstFile).ToLower();
+                        if (ext == ".jpg" || ext == ".jpeg" || ext == ".png" || ext == ".gif" || ext == ".bmp" || ext == ".tiff")
+                        {
+                            try
+                            {
+                                imgToSave = Image.FromFile(firstFile);
+                                shouldDisposeImage = true;
+                            }
+                            catch {}
+                        }
+                    }
+                }
+
+                if (imgToSave != null)
                 {
                     // Find Jpeg codec
                     ImageCodecInfo jpgCodec = ImageCodecInfo.GetImageDecoders()
@@ -177,22 +381,150 @@ class Program
                         using (EncoderParameter qualityParam = new EncoderParameter(Encoder.Quality, 75L))
                         {
                             encoderParams.Param[0] = qualityParam;
-                            img.Save(filepath, jpgCodec, encoderParams);
+                            imgToSave.Save(filepath, jpgCodec, encoderParams);
                         }
                     }
                     else
                     {
-                        img.Save(filepath, ImageFormat.Jpeg);
+                        imgToSave.Save(filepath, ImageFormat.Jpeg);
                     }
-                }
 
-                // Simulate key typing directly
-                SendKeys.SendWait("[#image-" + slot + "] ");
+                    if (shouldDisposeImage)
+                    {
+                        imgToSave.Dispose();
+                    }
+
+                    Log("HandleClipboardPaste: Saved image to " + filepath + ". Sending unicode text...");
+                    // Simulate key typing directly
+                    SendUnicodeText("[#image-" + slot + "] ");
+                }
+                else
+                {
+                    Log("HandleClipboardPaste: No image or file drop found in clipboard. Formats: " + string.Join(", ", clipboardData.GetFormats()));
+                }
+            }
+            else
+            {
+                Log("HandleClipboardPaste: Clipboard data is null");
             }
         }
         catch (Exception ex)
         {
+            Log("Error pasting clipboard image: " + ex.Message + "\nStack trace: " + ex.StackTrace);
             Console.Error.WriteLine("\nError pasting clipboard image: " + ex.Message);
         }
+    }
+
+    private static void SendUnicodeText(string text)
+    {
+        const ushort VK_SHIFT = 0x10;
+        const ushort VK_CONTROL = 0x11;
+        const ushort VK_MENU = 0x12; // Alt
+
+        // Check if modifiers are pressed so we can release them
+        bool isShiftDown = (GetKeyState(VK_SHIFT) & 0x8000) != 0;
+        bool isCtrlDown = (GetKeyState(VK_CONTROL) & 0x8000) != 0;
+        bool isAltDown = (GetKeyState(VK_MENU) & 0x8000) != 0;
+
+        int releaseCount = 0;
+        if (isShiftDown) releaseCount++;
+        if (isCtrlDown) releaseCount++;
+        if (isAltDown) releaseCount++;
+
+        int textCount = text.Length * 2;
+        INPUT[] inputs = new INPUT[releaseCount + textCount + releaseCount];
+        int idx = 0;
+
+        // 1. Release modifiers
+        if (isShiftDown)
+        {
+            inputs[idx].type = (uint)INPUT_KEYBOARD;
+            inputs[idx].union.ki.wVk = VK_SHIFT;
+            inputs[idx].union.ki.wScan = 0;
+            inputs[idx].union.ki.dwFlags = KEYEVENTF_KEYUP;
+            idx++;
+        }
+        if (isCtrlDown)
+        {
+            inputs[idx].type = (uint)INPUT_KEYBOARD;
+            inputs[idx].union.ki.wVk = VK_CONTROL;
+            inputs[idx].union.ki.wScan = 0;
+            inputs[idx].union.ki.dwFlags = KEYEVENTF_KEYUP;
+            idx++;
+        }
+        if (isAltDown)
+        {
+            inputs[idx].type = (uint)INPUT_KEYBOARD;
+            inputs[idx].union.ki.wVk = VK_MENU;
+            inputs[idx].union.ki.wScan = 0;
+            inputs[idx].union.ki.dwFlags = KEYEVENTF_KEYUP;
+            idx++;
+        }
+
+        // 2. Send the unicode text characters
+        for (int i = 0; i < text.Length; i++)
+        {
+            char c = text[i];
+            
+            // Key down
+            inputs[idx].type = (uint)INPUT_KEYBOARD;
+            inputs[idx].union.ki.wVk = 0;
+            inputs[idx].union.ki.wScan = (ushort)c;
+            inputs[idx].union.ki.dwFlags = KEYEVENTF_UNICODE;
+            idx++;
+            
+            // Key up
+            inputs[idx].type = (uint)INPUT_KEYBOARD;
+            inputs[idx].union.ki.wVk = 0;
+            inputs[idx].union.ki.wScan = (ushort)c;
+            inputs[idx].union.ki.dwFlags = KEYEVENTF_UNICODE | KEYEVENTF_KEYUP;
+            idx++;
+        }
+
+        // 3. Restore modifiers
+        if (isAltDown)
+        {
+            inputs[idx].type = (uint)INPUT_KEYBOARD;
+            inputs[idx].union.ki.wVk = VK_MENU;
+            inputs[idx].union.ki.wScan = 0;
+            inputs[idx].union.ki.dwFlags = 0; // Key down
+            idx++;
+        }
+        if (isCtrlDown)
+        {
+            inputs[idx].type = (uint)INPUT_KEYBOARD;
+            inputs[idx].union.ki.wVk = VK_CONTROL;
+            inputs[idx].union.ki.wScan = 0;
+            inputs[idx].union.ki.dwFlags = 0; // Key down
+            idx++;
+        }
+        if (isShiftDown)
+        {
+            inputs[idx].type = (uint)INPUT_KEYBOARD;
+            inputs[idx].union.ki.wVk = VK_SHIFT;
+            inputs[idx].union.ki.wScan = 0;
+            inputs[idx].union.ki.dwFlags = 0; // Key down
+            idx++;
+        }
+
+        uint sent = SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(typeof(INPUT)));
+        if (sent != inputs.Length)
+        {
+            Log("SendUnicodeText failed: sent " + sent + " of " + inputs.Length + " inputs. LastError: " + Marshal.GetLastWin32Error());
+        }
+        else
+        {
+            Log("SendUnicodeText succeeded: sent " + sent + " inputs.");
+        }
+    }
+
+    private static void Log(string message)
+    {
+        try
+        {
+            string logPath = Path.Combine(_tempFolder, "agy_wrapper_debug.log");
+            File.AppendAllText(logPath, DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") + " - " + message + Environment.NewLine);
+        }
+        catch {}
     }
 }

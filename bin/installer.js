@@ -51,6 +51,31 @@ function install() {
             process.exit(1);
         }
 
+        // Rename running agy.exe to a unique temporary name so we can overwrite it
+        const oldAgyPath = path.join(agyDir, `agy_old_${Date.now()}.exe`);
+        if (fs.existsSync(agyPath)) {
+            try {
+                fs.renameSync(agyPath, oldAgyPath);
+                console.log(`Renamed running agy.exe to ${path.basename(oldAgyPath)}`);
+            } catch (e) {
+                console.warn('Warning: Could not rename running agy.exe. Attempting direct overwrite...');
+            }
+        }
+
+        // Cleanup any older unlocked agy_old_*.exe files
+        try {
+            const files = fs.readdirSync(agyDir);
+            for (const file of files) {
+                if (file.startsWith('agy_old_') && file.endsWith('.exe')) {
+                    try {
+                        fs.unlinkSync(path.join(agyDir, file));
+                    } catch (e) {
+                        // File is locked (currently running), skip it
+                    }
+                }
+            }
+        } catch (e) {}
+
         const compileCmd = `"${cscCompiler}" /r:System.Windows.Forms.dll /r:System.Drawing.dll /out:"${agyPath}" "${wrapperSourcePath}"`;
         execSync(compileCmd);
         console.log(`Successfully compiled and installed native wrapper at ${agyPath}`);
