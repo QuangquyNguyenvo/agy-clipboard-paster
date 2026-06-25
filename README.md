@@ -1,15 +1,20 @@
-<!-- Animated SVG Header Banner -->
+<!-- Animated SVG Header -->
 <p align="center">
   <img src="assets/header.svg" alt="agy-clipboard-paster Banner" width="100%" />
 </p>
 
-<!-- Badges (Single line to prevent wrapping issues) -->
-<p align="center"><a href="https://www.npmjs.com/package/agy-clipboard-paster"><img src="https://img.shields.io/npm/v/agy-clipboard-paster.svg?style=flat-square&color=FF007A" alt="npm version"></a>&nbsp;<a href="https://www.npmjs.com/package/agy-clipboard-paster"><img src="https://img.shields.io/npm/dm/agy-clipboard-paster.svg?style=flat-square&color=7928CA" alt="npm downloads"></a>&nbsp;<a href="https://github.com/QuangquyNguyenvo/agy-clipboard-paster"><img src="https://img.shields.io/badge/platform-windows-blue.svg?style=flat-square&logo=windows" alt="platform"></a>&nbsp;<a href="LICENSE"><img src="https://img.shields.io/github/license/QuangquyNguyenvo/agy-clipboard-paster.svg?style=flat-square&color=00DFD8" alt="license"></a></p>
+<!-- Tightly grouped flat-square badges -->
+<p align="center">
+  <a href="https://www.npmjs.com/package/agy-clipboard-paster"><img src="https://img.shields.io/npm/v/agy-clipboard-paster.svg?style=flat-square&color=FF007A" alt="npm version"></a>&nbsp;
+  <a href="https://www.npmjs.com/package/agy-clipboard-paster"><img src="https://img.shields.io/npm/dm/agy-clipboard-paster.svg?style=flat-square&color=7928CA" alt="npm downloads"></a>&nbsp;
+  <a href="https://github.com/QuangquyNguyenvo/agy-clipboard-paster"><img src="https://img.shields.io/badge/platform-windows-blue.svg?style=flat-square&logo=windows" alt="platform"></a>&nbsp;
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/QuangquyNguyenvo/agy-clipboard-paster.svg?style=flat-square&color=00DFD8" alt="license"></a>
+</p>
 
 <!-- SVG Divider -->
 <p align="center">
-  <svg width="100%" height="20" viewBox="0 0 1200 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M0 10 H1200" stroke="url(#paint0_gradient)" stroke-width="2" stroke-dasharray="8 4" />
+  <svg width="100%" height="10" viewBox="0 0 1200 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M0 5 H1200" stroke="url(#paint0_gradient)" stroke-width="2" stroke-dasharray="6 3" />
     <defs>
       <linearGradient id="paint0_gradient" x1="0" y1="0" x2="1200" y2="0" gradientUnits="userSpaceOnUse">
         <stop stop-color="#FF007A" />
@@ -20,78 +25,51 @@
   </svg>
 </p>
 
-## 📌 Overview
-**`agy-clipboard-paster`** is a native Windows global shortcut utility that brings **instant Alt+V image pasting** to Google's **Antigravity CLI** (`agy`), similar to Claude Code.
+## <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2300FFF0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polygon points='13 2 3 14 12 14 11 22 21 10 12 10 13 2'></polygon></svg>" width="20" /> Features
+
+* **⚡ Alt + V Paste**: Insert clipboard images directly into the active `agy` chat prompt.
+* **🚀 Turbo Uploads**: Auto-compresses images into JPEGs (75% quality, <150KB) for instant API upload.
+* **🔒 Sandbox Safe**: Hook is only active when the terminal window is in focus. Zero risk of keylogger flags.
+* **🔄 Zero Dependencies**: 100% native C# wrapper compiled locally on Windows. No Python, Java, or Node runtime dependencies.
 
 ---
 
-## ✨ Features
-* **⚡ Native `Alt + V`**: Paste screenshots/images directly into the active terminal chat prompt.
-* **🚀 Zero-Lag Uploads**: Automatically compresses screenshots into lightweight JPEGs (75% quality, <150KB) for instant API upload.
-* **🔒 Safe from Antivirus**: Keyboard hooks are registered transiently and only active when the terminal window is in focus. Zero risk of keylogger flags.
-* **🔄 100% Native & Zero Dependencies**: Compiled locally via MS .NET compiler (`csc.exe`). No Python, Java, or Node dependencies needed.
+## <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%237928CA' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4'></path><polyline points='7 10 12 15 17 10'></polyline><line x1='12' y1='15' x2='12' y2='3'></line></svg>" width="20" /> Installation
 
----
+Choose either **PowerShell** (no dependencies) or **NPM**:
 
-## 🚀 Installation
-
-You can install this utility using either **PowerShell (No dependencies)** or **NPM**:
-
-### Method 1: PowerShell (Recommended - 1-Click Install)
-Open PowerShell and run:
+### Method 1: PowerShell (Recommended)
 ```powershell
 irm https://raw.githubusercontent.com/QuangquyNguyenvo/agy-clipboard-paster/main/install.ps1 | iex
 ```
 
 ### Method 2: NPM
-Install globally via npm:
 ```bash
 npm install -g agy-clipboard-paster
 ```
 
 ---
 
-## 🎮 How to Use
+## <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23FF007A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polygon points='5 3 19 12 5 21 5 3'></polygon></svg>" width="20" /> How to Use
 
-1. Copy any image or take a screenshot (`Win + Shift + S`).
-2. Focus the `agy` terminal and press **`Alt + V`**.
-3. A tag like **`[#image-1]`** will be typed into your input. 
-4. Write your request next to it and press **Enter**.
-
----
-
-## 🛠️ Uninstallation
-
-### For PowerShell Installation:
-Open PowerShell and run:
-```powershell
-irm https://raw.githubusercontent.com/QuangquyNguyenvo/agy-clipboard-paster/main/uninstall.ps1 | iex
-```
-
-### For NPM Installation:
-```bash
-npm uninstall -g agy-clipboard-paster
-```
-
-<!-- SVG Divider -->
-<p align="center">
-  <svg width="100%" height="20" viewBox="0 0 1200 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M0 10 H1200" stroke="url(#paint1_gradient)" stroke-width="2" stroke-dasharray="8 4" />
-    <defs>
-      <linearGradient id="paint1_gradient" x1="0" y1="0" x2="1200" y2="0" gradientUnits="userSpaceOnUse">
-        <stop stop-color="#FF007A" />
-        <stop offset="0.5" stop-color="#7928CA" />
-        <stop offset="1" stop-color="#00DFD8" />
-      </linearGradient>
-    </defs>
-  </svg>
-</p>
-
-## 📄 License
-This project is licensed under the MIT License.
+1. **Copy** any image or take a screenshot (`Win + Shift + S`).
+2. **Focus** the `agy` terminal and press **`Alt + V`**.
+3. **Send**: Type your request next to the **`[#image-1]`** tag and press **Enter**.
 
 ---
-<!-- Animated SVG Footer Banner -->
+
+## <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23FF0000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='3 6 5 6 21 6'></polyline><path d='M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2'></path><line x1='10' y1='11' x2='10' y2='17'></line><line x1='14' y1='11' x2='14' y2='17'></line></svg>" width="20" /> Uninstall
+
+* **PowerShell**:
+  ```powershell
+  irm https://raw.githubusercontent.com/QuangquyNguyenvo/agy-clipboard-paster/main/uninstall.ps1 | iex
+  ```
+* **NPM**:
+  ```bash
+  npm uninstall -g agy-clipboard-paster
+  ```
+
+<!-- Animated SVG Footer -->
 <p align="center">
   <img src="assets/footer.svg" alt="agy-clipboard-paster Footer" width="100%" />
 </p>
