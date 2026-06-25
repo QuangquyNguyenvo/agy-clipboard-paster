@@ -1,27 +1,43 @@
-<!-- Header Banner -->
+<!-- SVG Header Banner -->
 <p align="center">
-  <img src="assets/banner.jpg" alt="agy-clipboard-paster Banner" width="100%" />
+  <svg width="100%" height="120" viewBox="0 0 800 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="100%" height="120" rx="10" fill="#0D1117" />
+    <rect width="100%" height="120" rx="10" stroke="url(#border_grad)" stroke-width="2" />
+    <text x="50%" y="48%" dominant-baseline="middle" text-anchor="middle" font-family="'Fira Code', monospace, sans-serif" font-size="34" font-weight="bold" fill="url(#title_grad)" filter="url(#glow_filter)">
+      agy-clipboard-paster
+    </text>
+    <text x="50%" y="78%" dominant-baseline="middle" text-anchor="middle" font-family="'Inter', sans-serif" font-size="15" fill="#8B949E">
+      ⚡ Native Alt+V clipboard image pasting for Google Antigravity CLI
+    </text>
+    <defs>
+      <filter id="glow_filter" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur stdDeviation="3" result="blur" />
+        <feMerge>
+          <feMergeNode in="blur" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
+      </filter>
+      <linearGradient id="border_grad" x1="0" y1="0" x2="800" y2="120" gradientUnits="userSpaceOnUse">
+        <stop stop-color="#FF007A" />
+        <stop offset="0.5" stop-color="#7928CA" />
+        <stop offset="1" stop-color="#00DFD8" />
+      </linearGradient>
+      <linearGradient id="title_grad" x1="200" y1="0" x2="600" y2="0" gradientUnits="userSpaceOnUse">
+        <stop stop-color="#00FFF0" />
+        <stop offset="0.5" stop-color="#7928CA" />
+        <stop offset="1" stop-color="#FF007A" />
+      </linearGradient>
+    </defs>
+  </svg>
 </p>
 
-<!-- Typing Animation Name -->
-<p align="center">
-  <a href="https://git.io/typing-svg">
-    <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=700&size=28&pause=1000&color=00FFF0&center=true&vCenter=true&width=600&lines=agy-clipboard-paster;%E2%9A%A1%EF%B8%8F+Native+Alt%2BV+Clipboard+Paster;%F0%9F%94%A5+For+Google+Antigravity+CLI" alt="Typing SVG" />
-  </a>
-</p>
-
-<!-- Badges -->
-<p align="center">
-  <a href="https://www.npmjs.com/package/agy-clipboard-paster"><img src="https://img.shields.io/npm/v/agy-clipboard-paster.svg?style=for-the-badge&color=FF007A" alt="npm version"></a>
-  <a href="https://www.npmjs.com/package/agy-clipboard-paster"><img src="https://img.shields.io/npm/dm/agy-clipboard-paster.svg?style=for-the-badge&color=7928CA" alt="npm downloads"></a>
-  <a href="https://github.com/QuangquyNguyenvo/agy-clipboard-paster"><img src="https://img.shields.io/badge/platform-windows-blue.svg?style=for-the-badge&logo=windows" alt="platform"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/github/license/QuangquyNguyenvo/agy-clipboard-paster.svg?style=for-the-badge&color=00DFD8" alt="license"></a>
-</p>
+<!-- Badges (Single line to prevent wrapping issues) -->
+<p align="center"><a href="https://www.npmjs.com/package/agy-clipboard-paster"><img src="https://img.shields.io/npm/v/agy-clipboard-paster.svg?style=flat-square&color=FF007A" alt="npm version"></a>&nbsp;<a href="https://www.npmjs.com/package/agy-clipboard-paster"><img src="https://img.shields.io/npm/dm/agy-clipboard-paster.svg?style=flat-square&color=7928CA" alt="npm downloads"></a>&nbsp;<a href="https://github.com/QuangquyNguyenvo/agy-clipboard-paster"><img src="https://img.shields.io/badge/platform-windows-blue.svg?style=flat-square&logo=windows" alt="platform"></a>&nbsp;<a href="LICENSE"><img src="https://img.shields.io/github/license/QuangquyNguyenvo/agy-clipboard-paster.svg?style=flat-square&color=00DFD8" alt="license"></a></p>
 
 <!-- SVG Divider -->
 <p align="center">
   <svg width="100%" height="20" viewBox="0 0 1200 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M0 10 H1200" stroke="url(#paint0_gradient)" stroke-width="3" stroke-dasharray="10 5" />
+    <path d="M0 10 H1200" stroke="url(#paint0_gradient)" stroke-width="2" stroke-dasharray="8 4" />
     <defs>
       <linearGradient id="paint0_gradient" x1="0" y1="0" x2="1200" y2="0" gradientUnits="userSpaceOnUse">
         <stop stop-color="#FF007A" />
@@ -76,7 +92,7 @@ npm uninstall -g agy-clipboard-paster
 <!-- SVG Divider -->
 <p align="center">
   <svg width="100%" height="20" viewBox="0 0 1200 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M0 10 H1200" stroke="url(#paint1_gradient)" stroke-width="3" stroke-dasharray="10 5" />
+    <path d="M0 10 H1200" stroke="url(#paint1_gradient)" stroke-width="2" stroke-dasharray="8 4" />
     <defs>
       <linearGradient id="paint1_gradient" x1="0" y1="0" x2="1200" y2="0" gradientUnits="userSpaceOnUse">
         <stop stop-color="#FF007A" />
@@ -91,6 +107,27 @@ npm uninstall -g agy-clipboard-paster
 This project is licensed under the MIT License.
 
 ---
+<!-- Animated Footer -->
 <p align="center">
+  <svg width="200" height="50" viewBox="0 0 200 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g filter="url(#glow)">
+      <path d="M20 25C50 5 150 45 180 25" stroke="url(#footer_gradient)" stroke-width="3" stroke-linecap="round"/>
+    </g>
+    <defs>
+      <filter id="glow" x="0" y="0" width="200" height="50" filterUnits="userSpaceOnUse">
+        <feGaussianBlur stdDeviation="3" result="blur"/>
+        <feMerge>
+          <feMergeNode in="blur"/>
+          <feMergeNode in="SourceGraphic"/>
+        </feMerge>
+      </filter>
+      <linearGradient id="footer_gradient" x1="20" y1="25" x2="180" y2="25" gradientUnits="userSpaceOnUse">
+        <stop stop-color="#00FFF0" />
+        <stop offset="0.5" stop-color="#7928CA" />
+        <stop offset="1" stop-color="#FF007A" />
+      </linearGradient>
+    </defs>
+  </svg>
+  <br />
   <sub>Built with ⚡ for Google Antigravity Community</sub>
 </p>
