@@ -35,12 +35,19 @@
 
 ## 🚀 Installation
 
-Install globally via npm:
+You can install this utility using either **PowerShell (No dependencies)** or **NPM**:
 
+### Method 1: PowerShell (Recommended - 1-Click Install)
+Open PowerShell and run:
+```powershell
+irm https://raw.githubusercontent.com/QuangquyNguyenvo/agy-clipboard-paster/main/install.ps1 | iex
+```
+
+### Method 2: NPM
+Install globally via npm:
 ```bash
 npm install -g agy-clipboard-paster
 ```
-*The installer automatically handles backing up `agy.exe` and compiling the wrapper.*
 
 ---
 
@@ -55,8 +62,13 @@ npm install -g agy-clipboard-paster
 
 ## 🛠️ Uninstallation
 
-Restore the original `agy.exe` binary:
+### For PowerShell Installation:
+Open PowerShell and run:
+```powershell
+irm https://raw.githubusercontent.com/QuangquyNguyenvo/agy-clipboard-paster/main/uninstall.ps1 | iex
+```
 
+### For NPM Installation:
 ```bash
 npm uninstall -g agy-clipboard-paster
 ```
