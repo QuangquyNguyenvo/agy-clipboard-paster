@@ -1,0 +1,42 @@
+<svg width="800" height="150" viewBox="0 0 800 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    @keyframes blink {
+      0%, 100% { opacity: 0; }
+      50% { opacity: 1; }
+    }
+    .caret {
+      animation: blink 0.8s infinite;
+    }
+  </style>
+  
+  <rect width="800" height="150" rx="12" fill="#0D1117" stroke="#30363D" stroke-width="2"/>
+  
+  <defs>
+    <linearGradient id="textGrad" x1="0" y1="0" x2="800" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#00FFF0" />
+      <stop offset="50%" stop-color="#7928CA" />
+      <stop offset="100%" stop-color="#FF007A" />
+    </linearGradient>
+    
+    <clipPath id="typeClip">
+      <rect x="175" y="30" height="60" width="0">
+        <animate attributeName="width" values="0; 450; 450; 0" keyTimes="0; 0.4; 0.8; 1" dur="6s" repeatCount="indefinite" />
+      </rect>
+    </clipPath>
+  </defs>
+
+  <!-- Title Text with Clip Path -->
+  <text x="400" y="70" font-family="'Fira Code', monospace, sans-serif" font-size="36" font-weight="bold" fill="url(#textGrad)" text-anchor="middle" clip-path="url(#typeClip)">
+    agy-clipboard-paster
+  </text>
+  
+  <!-- Caret line -->
+  <rect x="175" y="38" width="3" height="32" fill="#00FFF0" class="caret">
+    <animate attributeName="x" values="175; 625; 625; 175" keyTimes="0; 0.4; 0.8; 1" dur="6s" repeatCount="indefinite" />
+  </rect>
+  
+  <!-- Subtitle -->
+  <text x="400" y="110" font-family="'Inter', sans-serif" font-size="14" fill="#8B949E" text-anchor="middle">
+    ⚡ Native Alt+V clipboard image pasting for Google Antigravity CLI
+  </text>
+</svg>
