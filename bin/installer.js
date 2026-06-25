@@ -77,8 +77,20 @@ function install() {
         } catch (e) {}
 
         const compileCmd = `"${cscCompiler}" /r:System.Windows.Forms.dll /r:System.Drawing.dll /out:"${agyPath}" "${wrapperSourcePath}"`;
-        execSync(compileCmd);
-        console.log(`Successfully compiled and installed native wrapper at ${agyPath}`);
+        try {
+            execSync(compileCmd);
+            console.log(`Successfully compiled and installed native wrapper at ${agyPath}`);
+        } catch (compileErr) {
+            if (fs.existsSync(oldAgyPath)) {
+                try {
+                    fs.renameSync(oldAgyPath, agyPath);
+                    console.log('Rolled back renamed agy.exe due to compile failure.');
+                } catch (rollbackErr) {
+                    console.error('Failed to roll back renamed agy.exe:', rollbackErr.message);
+                }
+            }
+            throw compileErr;
+        }
 
     } catch (err) {
         console.error('Installation failed:', err.message);
@@ -102,11 +114,30 @@ function uninstall() {
 
         // Restore original agy.exe
         if (fs.existsSync(realAgyPath)) {
+            let tempOldPath = '';
             if (fs.existsSync(agyPath)) {
-                fs.unlinkSync(agyPath);
+                try {
+                    tempOldPath = path.join(agyDir, `agy_old_wrapper_${Date.now()}.exe`);
+                    fs.renameSync(agyPath, tempOldPath);
+                } catch (e) {
+                    console.warn('Warning: Could not rename running agy.exe wrapper. Attempting direct removal...');
+                    try {
+                        fs.unlinkSync(agyPath);
+                    } catch (err) {
+                        // Ignore
+                    }
+                }
             }
             fs.renameSync(realAgyPath, agyPath);
             console.log('Restored original agy.exe successfully.');
+
+            if (tempOldPath && fs.existsSync(tempOldPath)) {
+                try {
+                    fs.unlinkSync(tempOldPath);
+                } catch (e) {
+                    // Silently ignore if locked
+                }
+            }
         }
     } catch (err) {
         console.error('Uninstallation failed:', err.message);
