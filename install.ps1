@@ -33,7 +33,19 @@ if (Test-Path $localCs) {
 } else {
     $url = "https://raw.githubusercontent.com/QuangquyNguyenvo/agy-clipboard-paster/main/src/agy_wrapper.cs"
     Write-Host "Downloading C# wrapper source code..." -ForegroundColor Cyan
-    Invoke-WebRequest -Uri $url -OutFile $tempCs -UseBasicParsing
+    try {
+        # Enable TLS 1.2 for secure handshake in older PowerShell environments
+        [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
+        Invoke-WebRequest -Uri $url -OutFile $tempCs -UseBasicParsing -ErrorAction Stop
+    } catch {
+        Write-Error "Failed to download C# wrapper source code from GitHub: $_"
+        Exit
+    }
+}
+
+if (-not (Test-Path $tempCs)) {
+    Write-Error "Source file $tempCs could not be prepared."
+    Exit
 }
 
 # 4. Compile C# wrapper
