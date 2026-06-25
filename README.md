@@ -15,7 +15,7 @@
   <a href="https://www.npmjs.com/package/agy-clipboard-paster"><img src="https://img.shields.io/npm/v/agy-clipboard-paster.svg?style=for-the-badge&color=FF007A" alt="npm version"></a>
   <a href="https://www.npmjs.com/package/agy-clipboard-paster"><img src="https://img.shields.io/npm/dm/agy-clipboard-paster.svg?style=for-the-badge&color=7928CA" alt="npm downloads"></a>
   <a href="https://github.com/google-antigravity/antigravity-cli"><img src="https://img.shields.io/badge/platform-windows-blue.svg?style=for-the-badge&logo=windows" alt="platform"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/github/license/google-antigravity/antigravity-cli.svg?style=for-the-badge&color=00DFD8" alt="license"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/QuangquyNguyenvo/agy-clipboard-paster.svg?style=for-the-badge&color=00DFD8" alt="license"></a>
 </p>
 
 <!-- SVG Divider 1 -->
