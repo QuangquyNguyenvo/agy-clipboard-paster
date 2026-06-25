@@ -25,9 +25,16 @@ if (-not (Test-Path $realAgyPath)) {
 }
 
 # 3. Use local C# source if available, otherwise download from GitHub
-$localCs = Join-Path $PSScriptRoot "src\agy_wrapper.cs"
 $tempCs = Join-Path $env:TEMP "agy_wrapper_temp.cs"
-if (Test-Path $localCs) {
+$useLocal = $false
+if ($PSScriptRoot) {
+    $localCs = Join-Path $PSScriptRoot "src\agy_wrapper.cs"
+    if (Test-Path $localCs) {
+        $useLocal = $true
+    }
+}
+
+if ($useLocal) {
     Copy-Item -Path $localCs -Destination $tempCs -Force
     Write-Host "Using local C# wrapper source code..." -ForegroundColor Cyan
 } else {
