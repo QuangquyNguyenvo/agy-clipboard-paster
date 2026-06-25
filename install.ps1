@@ -63,8 +63,38 @@ if (-not (Test-Path $cscCompiler)) {
     Exit
 }
 
+# Cleanup any older unlocked agy_old_*.exe files
+try {
+    Get-ChildItem -Path $agyDir -Filter "agy_old_*.exe" -ErrorAction SilentlyContinue | ForEach-Object {
+        Remove-Item -Path $_.FullName -Force -ErrorAction SilentlyContinue
+    }
+} catch {}
+
+# Rename running agy.exe to release lock
+$tempOldPath = $null
+if (Test-Path $agyPath) {
+    try {
+        $tempOldName = "agy_old_$(Get-Date -Format 'yyyyMMddHHmmss').exe"
+        $tempOldPath = Join-Path $agyDir $tempOldName
+        Rename-Item -Path $agyPath -NewName $tempOldName -Force -ErrorAction Stop
+        Write-Host "Renamed running agy.exe to release process lock..." -ForegroundColor Cyan
+    } catch {
+        Write-Warning "Could not rename running agy.exe. Attempting direct overwrite..."
+    }
+}
+
 Write-Host "Compiling wrapper..." -ForegroundColor Cyan
 & $cscCompiler /r:System.Windows.Forms.dll /r:System.Drawing.dll /out:"$agyPath" "$tempCs"
+
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "Compilation failed with exit code $LASTEXITCODE"
+    # Rollback rename if compile failed
+    if ($tempOldPath -and (Test-Path $tempOldPath)) {
+        Rename-Item -Path $tempOldPath -NewName "agy.exe" -Force -ErrorAction SilentlyContinue
+    }
+    Remove-Item -Path $tempCs -Force
+    Exit
+}
 
 # Cleanup
 Remove-Item -Path $tempCs -Force
