@@ -3,6 +3,12 @@
   <img src="assets/header.svg" alt="agy-clipboard-paster Banner" width="100%" />
 </p>
 
+<h1 align="center">agy-clipboard-paster</h1>
+
+<p align="center">
+  <b>Native Alt+V clipboard image paster for Google Antigravity CLI (agy) on Windows</b>
+</p>
+
 <!-- Tightly grouped flat-square badges -->
 <p align="center">
   <a href="https://github.com/QuangquyNguyenvo/agy-clipboard-paster"><img src="https://img.shields.io/badge/version-v1.0.0-FF007A?style=flat-square" alt="version"></a>&nbsp;
