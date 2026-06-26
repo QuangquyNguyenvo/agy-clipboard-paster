@@ -5,10 +5,9 @@
 
 <!-- Tightly grouped flat-square badges -->
 <p align="center">
-  <a href="https://www.npmjs.com/package/agy-clipboard-paster"><img src="https://img.shields.io/npm/v/agy-clipboard-paster.svg?style=flat-square&color=FF007A" alt="npm version"></a>&nbsp;
-  <a href="https://www.npmjs.com/package/agy-clipboard-paster"><img src="https://img.shields.io/npm/dm/agy-clipboard-paster.svg?style=flat-square&color=7928CA" alt="npm downloads"></a>&nbsp;
-  <a href="https://github.com/QuangquyNguyenvo/agy-clipboard-paster"><img src="https://img.shields.io/badge/platform-windows-blue.svg?style=flat-square&logo=windows" alt="platform"></a>&nbsp;
-  <a href="LICENSE"><img src="https://img.shields.io/github/license/QuangquyNguyenvo/agy-clipboard-paster.svg?style=flat-square&color=00DFD8" alt="license"></a>
+  <a href="https://github.com/QuangquyNguyenvo/agy-clipboard-paster"><img src="https://img.shields.io/badge/version-v1.0.0-FF007A?style=flat-square" alt="version"></a>&nbsp;
+  <a href="https://github.com/QuangquyNguyenvo/agy-clipboard-paster"><img src="https://img.shields.io/badge/platform-Windows-7928CA?style=flat-square&logo=windows&logoColor=white" alt="platform"></a>&nbsp;
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-00DFD8?style=flat-square" alt="license"></a>
 </p>
 
 <!-- SVG Divider -->
