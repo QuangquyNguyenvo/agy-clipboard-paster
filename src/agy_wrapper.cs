@@ -120,6 +120,22 @@ class Program
     static void Main(string[] args)
     {
         Log("agy_wrapper started. Args: " + string.Join(" ", args));
+
+        // Cleanup any temporary JPEG/PNG files from previous runs
+        try
+        {
+            string[] files = Directory.GetFiles(_tempFolder, "clipboard_temp_*.*");
+            foreach (string file in files)
+            {
+                string ext = Path.GetExtension(file).ToLower();
+                if (ext == ".jpg" || ext == ".jpeg" || ext == ".png")
+                {
+                    File.Delete(file);
+                }
+            }
+        }
+        catch {}
+
         // 1. Start the keyboard hook loop in a background STA thread
         System.Threading.Thread hookThread = new System.Threading.Thread(() =>
         {
@@ -322,8 +338,24 @@ class Program
             }
             if (slot > 5)
             {
-                slot = 1;
-                filepath = Path.Combine(_tempFolder, "clipboard_temp_1.jpg");
+                // All 5 slots are occupied. Overwrite the oldest one based on LastWriteTime.
+                DateTime oldestTime = DateTime.MaxValue;
+                int oldestSlot = 1;
+                for (int i = 1; i <= 5; i++)
+                {
+                    string path = Path.Combine(_tempFolder, "clipboard_temp_" + i + ".jpg");
+                    if (File.Exists(path))
+                    {
+                        DateTime writeTime = File.GetLastWriteTime(path);
+                        if (writeTime < oldestTime)
+                        {
+                            oldestTime = writeTime;
+                            oldestSlot = i;
+                        }
+                    }
+                }
+                slot = oldestSlot;
+                filepath = Path.Combine(_tempFolder, "clipboard_temp_" + slot + ".jpg");
             }
             Log("HandleClipboardPaste: Slot=" + slot + ", Path=" + filepath);
 
